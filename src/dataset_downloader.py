@@ -2,6 +2,11 @@
 """
 Dataset downloader for BACH dataset
 Provides utilities to download and setup the BACH dataset
+
+BACH Dataset: Breast Cancer Histology Challenge
+- 4 classes: Normal, Benign, In Situ Carcinoma, Invasive Carcinoma
+- 400 high-resolution images (100 per class)
+- From ICIAR 2018 Challenge
 """
 
 import os
