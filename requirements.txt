@@ -16,3 +16,7 @@ faiss-cpu>=1.7.0
 safetensors>=0.4.0
 requests>=2.25.0
 pathlib>=1.0.0
+# Additional requirements for thesis evaluation
+scipy>=1.9.0
+tensorboard>=2.10.0
+torchmetrics>=0.11.0
