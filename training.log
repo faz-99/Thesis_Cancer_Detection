@@ -62,3 +62,11 @@
 2025-08-08 03:13:03,209 - INFO - Starting training phase...
 2025-08-08 03:45:05,692 - INFO - Training - Loss: 1.5175, Accuracy: 0.4864
 2025-08-08 03:45:05,693 - INFO - Starting validation phase...
+2025-08-08 03:46:54,220 - INFO - Validation - Loss: 1.0500, Accuracy: 0.6175
+2025-08-08 03:46:54,299 - INFO - ✅ New best model! Validation accuracy: 0.6175
+2025-08-08 03:46:54,299 - INFO - Epoch 1 completed in 2031.09s
+2025-08-08 03:46:54,300 - INFO - 
+==================================================
+2025-08-08 03:46:54,300 - INFO - Epoch 2/10
+2025-08-08 03:46:54,300 - INFO - ==================================================
+2025-08-08 03:46:54,300 - INFO - Starting training phase...

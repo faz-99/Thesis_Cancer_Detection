@@ -56,24 +56,80 @@ Medical datasets often suffer from class imbalance, where certain disease types 
 
 ## 3. Dataset and Methodology
 
-### 3.1 BreakHis Dataset
+### 3.1 Datasets
+
+#### 3.1.1 BreakHis Dataset
 
 The BreakHis dataset contains 7,909 microscopic images of breast tumor tissue collected from 82 patients. The dataset includes:
 - **Benign classes:** Adenosis, Fibroadenoma, Phyllodes Tumor, Tubular Adenoma
 - **Malignant classes:** Ductal Carcinoma, Lobular Carcinoma, Mucinous Carcinoma, Papillary Carcinoma
 - **Magnifications:** 40X, 100X, 200X, 400X
 
-### 3.2 Data Preprocessing Pipeline
+#### 3.1.2 BACH Dataset
 
-#### 3.2.1 Metadata Extraction
+The BACH (Breast Cancer Histology) dataset from the ICIAR 2018 challenge provides high-resolution histopathological images:
+- **Classes:** Normal, Benign, In Situ Carcinoma, Invasive Carcinoma
+- **Total Images:** 400 (100 per class)
+- **Resolution:** High-resolution (2048 × 1536 pixels)
+- **Source:** ICIAR 2018 Challenge
+- **Characteristics:** Perfectly balanced dataset with clinical-grade image quality
+
+#### 3.1.3 Combined Dataset Strategy
+
+To leverage both datasets, we implement a unified classification approach:
+- **BreakHis mapping:** Benign subclasses → Benign, Malignant subclasses → Malignant
+- **BACH integration:** Direct mapping to unified categories
+- **Unified classes:** Normal, Benign, InSitu, Invasive, Malignant
+- **Total combined:** ~8,300 images
+- **Benefits:** Improved generalization across different imaging conditions and institutions
+
+### 3.2 Exploratory Data Analysis
+
+#### 3.2.1 BreakHis EDA
+
+Comprehensive analysis of the BreakHis dataset revealed:
+- **Class Distribution:** Significant imbalance with malignant cases dominating
+- **Magnification Analysis:** Consistent image quality across all magnification levels
+- **Patient Distribution:** Varying number of images per patient (range: 4-184)
+- **Image Properties:** Consistent 700×460 pixel resolution, RGB color space
+- **Quality Assessment:** High-quality histopathological staining with minimal artifacts
+
+#### 3.2.2 BACH EDA
+
+Detailed analysis of the BACH dataset showed:
+- **Perfect Balance:** Exactly 100 images per class ensuring no bias
+- **High Resolution:** 2048×1536 pixels providing rich morphological details
+- **Color Characteristics:** Distinct H&E staining patterns across classes
+- **Texture Analysis:** Significant texture differences between normal and cancerous tissues
+- **Image Quality:** Clinical-grade images with consistent staining and focus
+
+#### 3.2.3 Cross-Dataset Comparison
+
+| Metric | BreakHis | BACH |
+|--------|----------|------|
+| Total Images | 7,909 | 400 |
+| Classes | 8 | 4 |
+| Resolution | 700×460 | 2048×1536 |
+| Balance Ratio | 2.2:1 | 1:1 |
+| Magnifications | 4 levels | Single |
+| Patients | 82 | N/A |
+
+### 3.3 Data Preprocessing Pipeline
+
+#### 3.3.1 Metadata Extraction
 ```python
 def create_metadata(dataset_root):
     # Extract metadata from directory structure
     # Parse patient IDs, magnifications, and class labels
     # Return structured DataFrame
+
+def create_bach_metadata(dataset_root):
+    # Extract BACH metadata from class folders
+    # Handle high-resolution image properties
+    # Return structured DataFrame with unified format
 ```
 
-#### 3.2.2 Patient-wise Stratified Splitting
+#### 3.3.2 Patient-wise Stratified Splitting
 To prevent data leakage, we implement patient-wise splitting ensuring no patient appears in multiple splits:
 ```python
 def create_train_val_test_split(metadata, test_size=0.15, val_size=0.15):
@@ -82,12 +138,25 @@ def create_train_val_test_split(metadata, test_size=0.15, val_size=0.15):
     # Return train/val/test DataFrames
 ```
 
-#### 3.2.3 Image Preprocessing
+#### 3.3.3 Image Preprocessing
+
+**BreakHis Preprocessing:**
+- Resize to 224×224 pixels for EfficientNet compatibility
+- Normalize using ImageNet statistics
+- Standard data augmentation (rotation, flipping, color jittering)
+
+**BACH Preprocessing:**
+- Initial resize from 2048×1536 to 512×512 for memory efficiency
+- Final resize to 224×224 for model compatibility
+- Enhanced augmentation due to high-resolution source
+- Specialized transforms for histopathological images
+
+**Combined Dataset Preprocessing:**
 - Resize to 224×224 pixels for EfficientNet compatibility
 - Normalize using ImageNet statistics
 - Apply data augmentation for training set
 
-### 3.3 Class Imbalance Handling
+### 3.4 Class Imbalance Handling
 
 We address class imbalance through:
 1. **Weighted Random Sampling:** Inverse frequency weighting
@@ -365,3 +434,23 @@ Complete source code is available in the project repository:
 - 100X: 2,013 images (25.5%)
 - 200X: 1,976 images (25.0%)
 - 400X: 1,925 images (24.3%)
+
+**BACH Dataset Distribution:**
+- Total Images: 400
+- Normal: 100 images (25.0%)
+- Benign: 100 images (25.0%)
+- In Situ: 100 images (25.0%)
+- Invasive: 100 images (25.0%)
+- Perfect class balance (1:1:1:1 ratio)
+
+**Combined Dataset Statistics:**
+- Total Images: ~8,300
+- Unified Classes: 5 (Normal, Benign, InSitu, Invasive, Malignant)
+- Source Diversity: Two different institutions and imaging protocols
+- Resolution Range: 224×224 to 2048×1536 (after preprocessing: 224×224)
+
+**EDA Notebooks:**
+- BreakHis EDA: `notebooks/comprehensive_eda.ipynb`
+- BACH EDA: `notebooks/bach_eda.ipynb`
+- Combined analysis with cross-dataset comparisons
+- Quality assessment and preprocessing recommendations
