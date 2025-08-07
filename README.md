@@ -1,21 +1,26 @@
 # Breast Cancer Detection Thesis
 
 ## Overview
-This project implements a comprehensive breast cancer detection system using deep learning techniques on the BreakHis dataset.
+This project implements a comprehensive breast cancer detection system using deep learning techniques on the BreakHis and BACH datasets.
 
 ## Project Structure
 ```
 ├── data/                   # Dataset storage
+│   ├── breakhis/          # BreakHis dataset
+│   └── bach/              # BACH dataset
 ├── models/                 # Saved model weights
 ├── src/                    # Source code
-│   ├── data_utils.py      # Data processing utilities
+│   ├── data_utils.py      # BreakHis data utilities
+│   ├── bach_data_utils.py # BACH data utilities
+│   ├── dataset_downloader.py # Dataset download utilities
 │   ├── efficientnet.py    # EfficientNetB0 model
 │   ├── train.py           # Training utilities
 │   └── inference/         # Inference code
 ├── notebooks/             # Jupyter notebooks
 ├── api/                   # FastAPI backend
 ├── frontend/              # Vue.js frontend
-├── main_training.py       # Main training script
+├── main_training.py       # BreakHis training script
+├── main_combined_training.py # Combined datasets training
 └── requirements.txt       # Dependencies
 ```
 
@@ -29,6 +34,8 @@ pip install -r requirements.txt
 ```
 
 ### 2. Prepare Data
+
+#### BreakHis Dataset
 Ensure your BreakHis dataset is in the following structure:
 ```
 data/breakhis/BreaKHis_v1/BreaKHis_v1/histology_slides/breast/
@@ -36,9 +43,35 @@ data/breakhis/BreaKHis_v1/BreaKHis_v1/histology_slides/breast/
 └── malignant/
 ```
 
+#### BACH Dataset
+Download and setup the BACH dataset:
+```bash
+python src/dataset_downloader.py
+```
+
+Or manually create the structure:
+```
+data/bach/
+├── Normal/
+├── Benign/
+├── InSitu/
+└── Invasive/
+```
+
+Download BACH dataset from:
+- Official: https://iciar2018-challenge.grand-challenge.org/Dataset/
+- Kaggle: https://www.kaggle.com/datasets/paultimothymooney/breast-histopathology-images
+
 ### 3. Train Model
+
+#### BreakHis Only
 ```bash
 python main_training.py
+```
+
+#### Combined BreakHis + BACH
+```bash
+python main_combined_training.py
 ```
 
 ### 4. Run API Server
@@ -84,12 +117,25 @@ uvicorn main:app --reload
 
 ### Usage Examples
 
-#### Training
+#### BreakHis Training
 ```python
 from src.efficientnet import EfficientNetB0Classifier
 from src.train import train_model
 
 model = EfficientNetB0Classifier(num_classes=8)
+trained_model, history = train_model(model, train_loader, val_loader)
+```
+
+#### Combined Dataset Training
+```python
+from src.bach_data_utils import create_combined_metadata
+from src.efficientnet import EfficientNetB0Classifier
+
+# Load combined metadata
+metadata = create_combined_metadata(breakhis_root, bach_root)
+
+# Train with unified classes
+model = EfficientNetB0Classifier(num_classes=5)  # Unified classes
 trained_model, history = train_model(model, train_loader, val_loader)
 ```
 
@@ -102,10 +148,23 @@ with torch.no_grad():
 ```
 
 ## Dataset Information
+
+### BreakHis Dataset
 - **Classes**: 8 (4 benign + 4 malignant)
 - **Magnifications**: 40X, 100X, 200X, 400X
 - **Total Images**: ~7,900
 - **Split**: 70% train, 15% val, 15% test (patient-wise)
+
+### BACH Dataset
+- **Classes**: 4 (Normal, Benign, In Situ Carcinoma, Invasive Carcinoma)
+- **Resolution**: High-resolution (2048 x 1536 pixels)
+- **Total Images**: 400 (100 per class)
+- **Split**: 70% train, 15% val, 15% test
+
+### Combined Dataset
+- **Unified Classes**: Normal, Benign, InSitu, Invasive, Malignant
+- **Total Images**: ~8,300
+- **Benefits**: Improved generalization across different imaging conditions
 
 ## Performance Metrics
 - Accuracy, Precision, Recall, F1-score
