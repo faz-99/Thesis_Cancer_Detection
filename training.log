@@ -1,0 +1,62 @@
+2025-08-08 03:13:02,658 - INFO - Using device: cpu
+2025-08-08 03:13:02,658 - INFO - Creating metadata...
+2025-08-08 03:13:02,659 - INFO - Creating metadata from dataset root: data/breakhis/BreaKHis_v1/BreaKHis_v1/histology_slides/breast
+2025-08-08 03:13:02,659 - INFO - Scanning directory structure for images...
+2025-08-08 03:13:02,725 - INFO - Found 7909 PNG images
+2025-08-08 03:13:02,753 - INFO - Successfully processed 7909 images
+2025-08-08 03:13:02,755 - INFO - Label distribution: {'malignant': 5429, 'benign': 2480}
+2025-08-08 03:13:02,756 - INFO - Subclass distribution: {'ductal_carcinoma': 3451, 'fibroadenoma': 1014, 'mucinous_carcinoma': 792, 'lobular_carcinoma': 626, 'tubular_adenoma': 569, 'papillary_carcinoma': 560, 'phyllodes_tumor': 453, 'adenosis': 444}
+2025-08-08 03:13:02,757 - INFO - Magnification distribution: {'100X': 2081, '200X': 2013, '40X': 1995, '400X': 1820}
+2025-08-08 03:13:02,759 - INFO - Found 7909 images
+2025-08-08 03:13:02,759 - INFO - Creating train/val/test splits...
+2025-08-08 03:13:02,759 - INFO - Creating patient-wise splits: test=0.15, val=0.15
+2025-08-08 03:13:02,788 - INFO - Total unique patients: 7909
+2025-08-08 03:13:02,790 - INFO - Patient subclass distribution: {'ductal_carcinoma': 3451, 'fibroadenoma': 1014, 'mucinous_carcinoma': 792, 'lobular_carcinoma': 626, 'tubular_adenoma': 569, 'papillary_carcinoma': 560, 'phyllodes_tumor': 453, 'adenosis': 444}
+2025-08-08 03:13:02,790 - INFO - Performing train+val vs test split...
+2025-08-08 03:13:02,806 - INFO - Performing train vs val split...
+2025-08-08 03:13:02,828 - INFO - Split results:
+2025-08-08 03:13:02,830 - INFO -   Train: 5535 images from 5535 patients
+2025-08-08 03:13:02,830 - INFO -   Val: 1187 images from 1187 patients
+2025-08-08 03:13:02,831 - INFO -   Test: 1187 images from 1187 patients
+2025-08-08 03:13:02,832 - INFO - Creating class mappings and calculating weights...
+2025-08-08 03:13:02,836 - INFO - Found 8 classes: ['adenosis', 'ductal_carcinoma', 'fibroadenoma', 'lobular_carcinoma', 'mucinous_carcinoma', 'papillary_carcinoma', 'phyllodes_tumor', 'tubular_adenoma']
+2025-08-08 03:13:02,836 - INFO - Class counts: {'mucinous_carcinoma': 554, 'papillary_carcinoma': 392, 'ductal_carcinoma': 2415, 'lobular_carcinoma': 438, 'adenosis': 310, 'tubular_adenoma': 399, 'fibroadenoma': 710, 'phyllodes_tumor': 317}
+2025-08-08 03:13:02,837 - INFO - Class weights: {'adenosis': 1.4875447, 'ductal_carcinoma': 0.19094774, 'fibroadenoma': 0.64949125, 'lobular_carcinoma': 1.0528283, 'mucinous_carcinoma': 0.8323805, 'papillary_carcinoma': 1.1763746, 'phyllodes_tumor': 1.4546965, 'tubular_adenoma': 1.1557363}
+2025-08-08 03:13:02,840 - INFO - Train: 5535, Val: 1187, Test: 1187
+2025-08-08 03:13:02,841 - INFO - Number of classes: 8
+2025-08-08 03:13:02,853 - INFO - Creating data loaders...
+2025-08-08 03:13:02,853 - INFO - Creating data loaders with batch_size=32
+2025-08-08 03:13:02,854 - INFO - Creating image transforms...
+2025-08-08 03:13:02,854 - INFO - Created training transforms with augmentation
+2025-08-08 03:13:02,854 - INFO - Created test transforms without augmentation
+2025-08-08 03:13:02,857 - INFO - Created BreakHisDataset with 5535 samples
+2025-08-08 03:13:02,858 - INFO - Created BreakHisDataset with 1187 samples
+2025-08-08 03:13:02,859 - INFO - Created BreakHisDataset with 1187 samples
+2025-08-08 03:13:02,859 - INFO - Created datasets: Train=5535, Val=1187, Test=1187
+2025-08-08 03:13:02,859 - INFO - Creating weighted sampler for training...
+2025-08-08 03:13:02,889 - INFO - Created data loaders:
+2025-08-08 03:13:02,889 - INFO -   Train: 172 batches with weighted sampling
+2025-08-08 03:13:02,890 - INFO -   Val: 38 batches
+2025-08-08 03:13:02,890 - INFO -   Test: 38 batches
+2025-08-08 03:13:02,890 - INFO - Initializing model...
+2025-08-08 03:13:02,890 - INFO - Initializing EfficientNetB0 classifier:
+2025-08-08 03:13:02,890 - INFO -   - Number of classes: 8
+2025-08-08 03:13:02,890 - INFO -   - Pretrained: True
+2025-08-08 03:13:02,890 - INFO - Loading ImageNet pretrained weights...
+2025-08-08 03:13:03,166 - INFO - Original classifier input features: 1280
+2025-08-08 03:13:03,167 - INFO - Replaced final layer: 1280 -> 8
+2025-08-08 03:13:03,170 - INFO - Model parameters: 4,017,796 total, 4,017,796 trainable
+2025-08-08 03:13:03,173 - INFO - Starting training...
+2025-08-08 03:13:03,173 - INFO - Starting model training:
+2025-08-08 03:13:03,173 - INFO -   - Epochs: 10
+2025-08-08 03:13:03,173 - INFO -   - Learning rate: 0.0001
+2025-08-08 03:13:03,173 - INFO -   - Device: cpu
+2025-08-08 03:13:03,173 - INFO -   - Training batches: 172
+2025-08-08 03:13:03,173 - INFO -   - Validation batches: 38
+2025-08-08 03:13:03,173 - INFO - Using standard CrossEntropyLoss
+2025-08-08 03:13:03,175 - INFO - Using Adam optimizer with weight_decay=1e-5
+2025-08-08 03:13:03,209 - INFO - 
+==================================================
+2025-08-08 03:13:03,209 - INFO - Epoch 1/10
+2025-08-08 03:13:03,209 - INFO - ==================================================
+2025-08-08 03:13:03,209 - INFO - Starting training phase...
