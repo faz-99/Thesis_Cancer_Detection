@@ -10,3 +10,6 @@ tqdm>=4.62.0
 fastapi>=0.68.0
 uvicorn>=0.15.0
 python-multipart>=0.0.5
+transformers>=4.20.0
+faiss-cpu>=1.7.0
+opencv-python>=4.5.0
