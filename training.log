@@ -80,3 +80,123 @@
 2025-08-08 04:17:59,579 - INFO - Epoch 3/10
 2025-08-08 04:17:59,579 - INFO - ==================================================
 2025-08-08 04:17:59,580 - INFO - Starting training phase...
+2025-08-08 04:44:25,224 - INFO - Training - Loss: 0.4995, Accuracy: 0.8241
+2025-08-08 04:44:25,225 - INFO - Starting validation phase...
+2025-08-08 04:45:47,272 - INFO - Validation - Loss: 0.4996, Accuracy: 0.7928
+2025-08-08 04:45:47,314 - INFO - ✅ New best model! Validation accuracy: 0.7928
+2025-08-08 04:45:47,314 - INFO - Epoch 3 completed in 1667.73s
+2025-08-08 04:45:47,314 - INFO - 
+==================================================
+2025-08-08 04:45:47,315 - INFO - Epoch 4/10
+2025-08-08 04:45:47,316 - INFO - ==================================================
+2025-08-08 04:45:47,316 - INFO - Starting training phase...
+2025-08-08 05:09:46,489 - INFO - Training - Loss: 0.3965, Accuracy: 0.8661
+2025-08-08 05:09:46,490 - INFO - Starting validation phase...
+2025-08-08 05:11:14,465 - INFO - Validation - Loss: 0.4095, Accuracy: 0.8441
+2025-08-08 05:11:14,508 - INFO - ✅ New best model! Validation accuracy: 0.8441
+2025-08-08 05:11:14,508 - INFO - Epoch 4 completed in 1527.19s
+2025-08-08 05:11:14,508 - INFO - 
+==================================================
+2025-08-08 05:11:14,508 - INFO - Epoch 5/10
+2025-08-08 05:11:14,509 - INFO - ==================================================
+2025-08-08 05:11:14,509 - INFO - Starting training phase...
+2025-08-08 05:34:55,143 - INFO - Training - Loss: 0.3112, Accuracy: 0.8914
+2025-08-08 05:34:55,145 - INFO - Starting validation phase...
+2025-08-08 05:36:28,597 - INFO - Validation - Loss: 0.4097, Accuracy: 0.8534
+2025-08-08 05:36:28,666 - INFO - ✅ New best model! Validation accuracy: 0.8534
+2025-08-08 05:36:28,666 - INFO - Epoch 5 completed in 1514.16s
+2025-08-08 05:36:28,667 - INFO - 
+==================================================
+2025-08-08 05:36:28,667 - INFO - Epoch 6/10
+2025-08-08 05:36:28,667 - INFO - ==================================================
+2025-08-08 05:36:28,667 - INFO - Starting training phase...
+2025-08-08 06:00:59,190 - INFO - Training - Loss: 0.2613, Accuracy: 0.9113
+2025-08-08 06:00:59,192 - INFO - Starting validation phase...
+2025-08-08 06:02:27,707 - INFO - Validation - Loss: 0.3450, Accuracy: 0.8728
+2025-08-08 06:02:27,750 - INFO - ✅ New best model! Validation accuracy: 0.8728
+2025-08-08 06:02:27,750 - INFO - Epoch 6 completed in 1559.08s
+2025-08-08 06:02:27,750 - INFO - 
+==================================================
+2025-08-08 06:02:27,751 - INFO - Epoch 7/10
+2025-08-08 06:02:27,751 - INFO - ==================================================
+2025-08-08 06:02:27,751 - INFO - Starting training phase...
+2025-08-08 06:27:02,915 - INFO - Training - Loss: 0.2258, Accuracy: 0.9248
+2025-08-08 06:27:02,917 - INFO - Starting validation phase...
+2025-08-08 06:28:29,668 - INFO - Validation - Loss: 0.3844, Accuracy: 0.8534
+2025-08-08 06:28:29,668 - INFO - No improvement for 1 epochs
+2025-08-08 06:28:29,668 - INFO - Epoch 7 completed in 1561.92s
+2025-08-08 06:28:29,668 - INFO - 
+==================================================
+2025-08-08 06:28:29,668 - INFO - Epoch 8/10
+2025-08-08 06:28:29,668 - INFO - ==================================================
+2025-08-08 06:28:29,668 - INFO - Starting training phase...
+2025-08-08 06:53:10,128 - INFO - Training - Loss: 0.1945, Accuracy: 0.9304
+2025-08-08 06:53:10,130 - INFO - Starting validation phase...
+2025-08-08 06:54:39,292 - INFO - Validation - Loss: 0.3143, Accuracy: 0.8829
+2025-08-08 06:54:39,338 - INFO - ✅ New best model! Validation accuracy: 0.8829
+2025-08-08 06:54:39,339 - INFO - Epoch 8 completed in 1569.67s
+2025-08-08 06:54:39,339 - INFO - 
+==================================================
+2025-08-08 06:54:39,339 - INFO - Epoch 9/10
+2025-08-08 06:54:39,339 - INFO - ==================================================
+2025-08-08 06:54:39,339 - INFO - Starting training phase...
+2025-08-08 07:19:28,245 - INFO - Training - Loss: 0.1760, Accuracy: 0.9382
+2025-08-08 07:19:28,247 - INFO - Starting validation phase...
+2025-08-08 07:20:56,885 - INFO - Validation - Loss: 0.2789, Accuracy: 0.8964
+2025-08-08 07:20:56,932 - INFO - ✅ New best model! Validation accuracy: 0.8964
+2025-08-08 07:20:56,932 - INFO - Epoch 9 completed in 1577.59s
+2025-08-08 07:20:56,932 - INFO - 
+==================================================
+2025-08-08 07:20:56,933 - INFO - Epoch 10/10
+2025-08-08 07:20:56,933 - INFO - ==================================================
+2025-08-08 07:20:56,933 - INFO - Starting training phase...
+2025-08-08 07:45:55,410 - INFO - Training - Loss: 0.1475, Accuracy: 0.9489
+2025-08-08 07:45:55,411 - INFO - Starting validation phase...
+2025-08-08 07:47:23,316 - INFO - Validation - Loss: 0.2822, Accuracy: 0.9006
+2025-08-08 07:47:23,361 - INFO - ✅ New best model! Validation accuracy: 0.9006
+2025-08-08 07:47:23,362 - INFO - Epoch 10 completed in 1586.43s
+2025-08-08 07:47:23,382 - INFO - 
+==================================================
+2025-08-08 07:47:23,382 - INFO - TRAINING COMPLETED
+2025-08-08 07:47:23,383 - INFO - ==================================================
+2025-08-08 07:47:23,383 - INFO - Total training time: 16460.15s
+2025-08-08 07:47:23,383 - INFO - Best validation accuracy: 0.9006
+2025-08-08 07:47:23,383 - INFO - Final training accuracy: 0.9489
+2025-08-08 07:47:23,383 - INFO - Model weights restored to best checkpoint
+2025-08-08 07:47:23,497 - INFO - Model saved to models/efficientnet_b0_best.pth
+2025-08-08 07:47:23,497 - INFO - Evaluating on test set...
+2025-08-08 07:47:23,498 - INFO - Starting model evaluation on test set...
+2025-08-08 07:47:23,498 - INFO - Test batches: 38
+2025-08-08 07:48:55,438 - INFO - Evaluation completed in 91.94s
+2025-08-08 07:48:55,438 - INFO - Test accuracy: 0.9090
+2025-08-08 07:48:55,439 - INFO - Total test samples: 1187
+2025-08-08 07:48:55,439 - INFO - Generating detailed classification metrics...
+2025-08-08 07:48:55,486 - INFO - Per-class accuracy:
+2025-08-08 07:48:55,486 - INFO -   adenosis: 0.9403 (67 samples)
+2025-08-08 07:48:55,487 - INFO -   ductal_carcinoma: 0.8919 (518 samples)
+2025-08-08 07:48:55,487 - INFO -   fibroadenoma: 0.9276 (152 samples)
+2025-08-08 07:48:55,488 - INFO -   lobular_carcinoma: 0.8404 (94 samples)
+2025-08-08 07:48:55,488 - INFO -   mucinous_carcinoma: 0.9244 (119 samples)
+2025-08-08 07:48:55,489 - INFO -   papillary_carcinoma: 0.9405 (84 samples)
+2025-08-08 07:48:55,489 - INFO -   phyllodes_tumor: 0.9559 (68 samples)
+2025-08-08 07:48:55,490 - INFO -   tubular_adenoma: 0.9412 (85 samples)
+2025-08-08 07:48:55,491 - INFO - Model evaluation completed successfully
+2025-08-08 07:48:55,493 - INFO - Test Accuracy: 0.9090
+2025-08-08 07:48:55,494 - INFO - Classification Report:
+2025-08-08 07:48:55,494 - INFO - 
+                     precision    recall  f1-score   support
+
+           adenosis     0.9545    0.9403    0.9474        67
+   ductal_carcinoma     0.9686    0.8919    0.9286       518
+       fibroadenoma     0.9276    0.9276    0.9276       152
+  lobular_carcinoma     0.6220    0.8404    0.7149        94
+ mucinous_carcinoma     0.9322    0.9244    0.9283       119
+papillary_carcinoma     0.9294    0.9405    0.9349        84
+    phyllodes_tumor     0.8667    0.9559    0.9091        68
+    tubular_adenoma     0.9195    0.9412    0.9302        85
+
+           accuracy                         0.9090      1187
+          macro avg     0.8901    0.9203    0.9026      1187
+       weighted avg     0.9193    0.9090    0.9120      1187
+
+2025-08-08 07:48:55,495 - INFO - Training completed successfully!
