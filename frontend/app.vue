@@ -78,24 +78,30 @@
           </div>
         </div>
 
+        <!-- Test Image -->
+        <div class="mb-6">
+          <h3 class="font-semibold text-lg mb-4">Test Base64 Image</h3>
+          <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==" alt="Test" class="w-16 h-16 bg-red-500" />
+        </div>
+
         <!-- Visualization -->
-        <div v-if="hasVisualization" class="mb-6">
+        <div v-if="prediction && prediction.visualization" class="mb-6">
           <h3 class="font-semibold text-lg mb-4">Visual Analysis</h3>
-          <div class="grid md:grid-cols-3 gap-4">
-            <div class="text-center">
+          <div class="space-y-4">
+            <div v-if="prediction.visualization.original">
               <h4 class="text-sm font-medium mb-2">Original Image</h4>
-              <img :src="visualizationData.original" alt="Original" class="w-full max-w-sm mx-auto rounded-lg border" style="max-height: 200px;" />
+              <img :src="prediction.visualization.original" alt="Original" class="max-w-xs rounded-lg border" />
             </div>
-            <div class="text-center">
+            <div v-if="prediction.visualization.heatmap">
               <h4 class="text-sm font-medium mb-2">Attention Heatmap</h4>
-              <img :src="visualizationData.heatmap" alt="Heatmap" class="w-full max-w-sm mx-auto rounded-lg border" style="max-height: 200px;" />
+              <img :src="prediction.visualization.heatmap" alt="Heatmap" class="max-w-xs rounded-lg border" />
             </div>
-            <div class="text-center">
+            <div v-if="prediction.visualization.overlay">
               <h4 class="text-sm font-medium mb-2">Overlay Analysis</h4>
-              <img :src="visualizationData.overlay" alt="Overlay" class="w-full max-w-sm mx-auto rounded-lg border" style="max-height: 200px;" />
+              <img :src="prediction.visualization.overlay" alt="Overlay" class="max-w-xs rounded-lg border" />
             </div>
           </div>
-          <p class="text-sm text-gray-600 mt-2 text-center">
+          <p class="text-sm text-gray-600 mt-2">
             Red areas indicate regions that most influenced the AI's decision
           </p>
         </div>
@@ -175,21 +181,4 @@ const predictImage = async () => {
 const formatClassName = (className) => {
   return className.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
 }
-
-const hasVisualization = computed(() => {
-  return prediction.value && 
-         prediction.value.visualization && 
-         prediction.value.visualization.original &&
-         prediction.value.visualization.heatmap &&
-         prediction.value.visualization.overlay
-})
-
-const visualizationData = computed(() => {
-  if (!hasVisualization.value) return null
-  return {
-    original: prediction.value.visualization.original,
-    heatmap: prediction.value.visualization.heatmap,
-    overlay: prediction.value.visualization.overlay
-  }
-})
 </script>
