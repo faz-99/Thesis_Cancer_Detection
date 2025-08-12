@@ -76,8 +76,14 @@ async def load_models():
         model = model.to(device)
         model.eval()
         
-        # Initialize RAG explainer
-        rag_explainer = RAGExplainer()
+        # Initialize RAG explainer with error handling
+        try:
+            rag_explainer = RAGExplainer()
+            print("✅ RAG explainer loaded successfully")
+        except Exception as e:
+            print(f"⚠️ RAG explainer failed to load: {e}")
+            rag_explainer = None
+        
         print("✅ Models loaded successfully")
         
     except Exception as e:
@@ -116,10 +122,27 @@ async def predict_image(image: UploadFile = File(...)):
         confidence_score = confidence.item()
         
         # Generate explanation using RAG
-        explanation_result = rag_explainer.generate_explanation(
-            prediction.item(), 
-            confidence_score
-        )
+        if rag_explainer:
+            try:
+                explanation_result = rag_explainer.generate_explanation(
+                    prediction.item(), 
+                    confidence_score
+                )
+            except Exception as e:
+                print(f"RAG explanation failed: {e}")
+                explanation_result = {
+                    'prediction': predicted_class,
+                    'confidence': confidence_score,
+                    'explanation': f"Predicted as {predicted_class} with {confidence_score:.2%} confidence.",
+                    'relevant_facts': []
+                }
+        else:
+            explanation_result = {
+                'prediction': predicted_class,
+                'confidence': confidence_score,
+                'explanation': f"Predicted as {predicted_class} with {confidence_score:.2%} confidence.",
+                'relevant_facts': []
+            }
         
         # Prepare response
         result = {
@@ -148,17 +171,46 @@ async def explain_image(image: UploadFile = File(...)):
         pil_image = Image.open(io.BytesIO(contents)).convert("RGB")
         input_tensor = transform(pil_image)
         
-        # Generate comprehensive explanation
-        explanation = explain_prediction(model, input_tensor, rag_explainer, device)
+        # Make basic prediction first
+        with torch.no_grad():
+            if isinstance(model, EnhancedEfficientNetB0):
+                main_output, lobular_output = model(input_tensor.unsqueeze(0).to(device))
+                output = main_output
+            else:
+                output = model(input_tensor.unsqueeze(0).to(device))
+            
+            probabilities = F.softmax(output, dim=1)
+            confidence, prediction = torch.max(probabilities, 1)
         
-        # Convert numpy arrays to lists for JSON serialization
-        if 'visual_explanation' in explanation:
-            explanation['visual_explanation'] = explanation['visual_explanation'].tolist()
+        predicted_class = class_names[prediction.item()]
+        confidence_score = confidence.item()
+        
+        # Try to generate comprehensive explanation
+        try:
+            explanation = explain_prediction(model, input_tensor, rag_explainer, device)
+            if 'visual_explanation' in explanation:
+                explanation['visual_explanation'] = explanation['visual_explanation'].tolist()
+        except Exception as e:
+            print(f"Visual explanation failed: {e}")
+            # Fallback to basic explanation
+            explanation = {
+                'prediction': prediction.item(),
+                'confidence': confidence_score,
+                'textual_explanation': rag_explainer.generate_explanation(
+                    prediction.item(), confidence_score
+                ) if rag_explainer else {
+                    'prediction': predicted_class,
+                    'confidence': confidence_score,
+                    'explanation': f"Predicted as {predicted_class} with {confidence_score:.2%} confidence.",
+                    'relevant_facts': []
+                },
+                'visual_explanation': None
+            }
         
         return JSONResponse(content=explanation)
         
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Explanation failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Analysis failed: {str(e)}")
 
 @app.get("/api/classes")
 async def get_classes():
