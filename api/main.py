@@ -7,6 +7,9 @@ from PIL import Image
 import io
 import numpy as np
 from torchvision import transforms
+import cv2
+import base64
+from torch.nn import functional as F
 
 # Import your models
 import sys
@@ -14,8 +17,15 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.efficientnet import EfficientNetB0Classifier
-from src.enhanced_efficientnet import EnhancedEfficientNetB0
-from src.rag_explainer import RAGExplainer, explain_prediction
+try:
+    from src.enhanced_efficientnet import EnhancedEfficientNetB0
+except ImportError:
+    EnhancedEfficientNetB0 = None
+try:
+    from src.rag_explainer import RAGExplainer, explain_prediction
+except ImportError:
+    RAGExplainer = None
+    explain_prediction = None
 
 app = FastAPI(title="Breast Cancer Detection API", version="1.0.0")
 
@@ -58,30 +68,27 @@ async def load_models():
     global model, rag_explainer
     
     try:
-        # Try to load lobular-enhanced model first
+        # Load regular model
         try:
-            model = EnhancedEfficientNetB0(num_classes=8, pretrained=False)
-            model.load_state_dict(torch.load("models/enhanced_efficientnet_lobular_v1.pth", map_location=device))
-            print("✅ Loaded lobular-enhanced model v1")
+            model = EfficientNetB0Classifier(num_classes=8, pretrained=False)
+            model.load_state_dict(torch.load("models/efficientnet_b0_best.pth", map_location=device))
+            print("✅ Loaded original trained model")
         except FileNotFoundError:
-            # Fallback to regular model
-            try:
-                model = EfficientNetB0Classifier(num_classes=8, pretrained=False)
-                model.load_state_dict(torch.load("models/efficientnet_b0_best.pth", map_location=device))
-                print("✅ Loaded original trained model")
-            except FileNotFoundError:
-                print("⚠️ No saved weights found, using pretrained model")
-                model = EfficientNetB0Classifier(num_classes=8, pretrained=True)
+            print("⚠️ No saved weights found, using pretrained model")
+            model = EfficientNetB0Classifier(num_classes=8, pretrained=True)
         
         model = model.to(device)
         model.eval()
         
         # Initialize RAG explainer with error handling
-        try:
-            rag_explainer = RAGExplainer()
-            print("✅ RAG explainer loaded successfully")
-        except Exception as e:
-            print(f"⚠️ RAG explainer failed to load: {e}")
+        if RAGExplainer:
+            try:
+                rag_explainer = RAGExplainer()
+                print("✅ RAG explainer loaded successfully")
+            except Exception as e:
+                print(f"⚠️ RAG explainer failed to load: {e}")
+                rag_explainer = None
+        else:
             rag_explainer = None
         
         print("✅ Models loaded successfully")
@@ -109,11 +116,7 @@ async def predict_image(image: UploadFile = File(...)):
         
         # Make prediction
         with torch.no_grad():
-            if isinstance(model, EnhancedEfficientNetB0):
-                main_output, lobular_output = model(input_tensor.unsqueeze(0).to(device))
-                output = main_output
-            else:
-                output = model(input_tensor.unsqueeze(0).to(device))
+            output = model(input_tensor.unsqueeze(0).to(device))
             
             probabilities = F.softmax(output, dim=1)
             confidence, prediction = torch.max(probabilities, 1)
@@ -144,13 +147,29 @@ async def predict_image(image: UploadFile = File(...)):
                 'relevant_facts': []
             }
         
+        # Get top 3 predictions
+        top3_probs, top3_indices = torch.topk(probabilities[0], 3)
+        top3_predictions = {
+            class_names[idx.item()]: float(prob) 
+            for idx, prob in zip(top3_indices, top3_probs)
+        }
+        
+        # Generate Grad-CAM visualization
+        try:
+            heatmap = generate_gradcam(model, input_tensor, prediction.item())
+            visualization = overlay_heatmap(pil_image, heatmap)
+        except Exception as e:
+            print(f"Grad-CAM failed: {e}")
+            visualization = None
+        
         # Prepare response
         result = {
             "prediction": predicted_class,
             "confidence": confidence_score,
-            "probabilities": {class_names[i]: float(probabilities[0][i]) for i in range(8)},
+            "probabilities": top3_predictions,
             "textual_explanation": explanation_result,
-            "risk_level": get_risk_level(predicted_class)
+            "risk_level": get_risk_level(predicted_class),
+            "visualization": visualization
         }
         
         return JSONResponse(content=result)
@@ -173,11 +192,7 @@ async def explain_image(image: UploadFile = File(...)):
         
         # Make basic prediction first
         with torch.no_grad():
-            if isinstance(model, EnhancedEfficientNetB0):
-                main_output, lobular_output = model(input_tensor.unsqueeze(0).to(device))
-                output = main_output
-            else:
-                output = model(input_tensor.unsqueeze(0).to(device))
+            output = model(input_tensor.unsqueeze(0).to(device))
             
             probabilities = F.softmax(output, dim=1)
             confidence, prediction = torch.max(probabilities, 1)
@@ -220,6 +235,71 @@ async def get_classes():
         "benign": ["adenosis", "fibroadenoma", "phyllodes_tumor", "tubular_adenoma"],
         "malignant": ["ductal_carcinoma", "lobular_carcinoma", "mucinous_carcinoma", "papillary_carcinoma"]
     }
+
+def generate_gradcam(model, input_tensor, target_class):
+    """Generate Grad-CAM heatmap"""
+    model.eval()
+    
+    # Hook for gradients
+    gradients = []
+    activations = []
+    
+    def backward_hook(module, grad_input, grad_output):
+        gradients.append(grad_output[0])
+    
+    def forward_hook(module, input, output):
+        activations.append(output)
+    
+    # Register hooks on the last convolutional layer
+    target_layer = model.efficientnet.features[-1]
+    target_layer.register_forward_hook(forward_hook)
+    target_layer.register_backward_hook(backward_hook)
+    
+    # Forward pass
+    input_tensor.requires_grad_()
+    output = model(input_tensor.unsqueeze(0))
+    
+    # Backward pass
+    model.zero_grad()
+    output[0, target_class].backward()
+    
+    # Generate heatmap
+    gradients_val = gradients[0].cpu().data.numpy()[0]
+    activations_val = activations[0].cpu().data.numpy()[0]
+    
+    weights = np.mean(gradients_val, axis=(1, 2))
+    cam = np.zeros(activations_val.shape[1:], dtype=np.float32)
+    
+    for i, w in enumerate(weights):
+        cam += w * activations_val[i, :, :]
+    
+    cam = np.maximum(cam, 0)
+    cam = cv2.resize(cam, (224, 224))
+    cam = cam - np.min(cam)
+    cam = cam / np.max(cam)
+    
+    return cam
+
+def overlay_heatmap(image, heatmap):
+    """Overlay heatmap on original image"""
+    # Convert PIL to numpy
+    img_array = np.array(image.resize((224, 224)))
+    
+    # Create heatmap
+    heatmap_colored = cv2.applyColorMap(np.uint8(255 * heatmap), cv2.COLORMAP_JET)
+    heatmap_colored = cv2.cvtColor(heatmap_colored, cv2.COLOR_BGR2RGB)
+    
+    # Overlay
+    overlayed = 0.6 * img_array + 0.4 * heatmap_colored
+    overlayed = np.uint8(overlayed)
+    
+    # Convert to base64
+    pil_img = Image.fromarray(overlayed)
+    buffer = io.BytesIO()
+    pil_img.save(buffer, format='PNG')
+    img_str = base64.b64encode(buffer.getvalue()).decode()
+    
+    return f"data:image/png;base64,{img_str}"
 
 def get_risk_level(prediction):
     """Determine risk level based on prediction"""
