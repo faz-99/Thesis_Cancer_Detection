@@ -1,6 +1,6 @@
 # Cancer Detection UI
 
-Interactive web interface for breast cancer detection using histopathological images.
+Interactive Vue.js interface for breast cancer detection using histopathological images.
 
 ## Setup
 
@@ -24,3 +24,10 @@ npm run dev
 The UI connects to the FastAPI backend at `http://localhost:8000`
 
 Make sure your API server is running before using the interface.
+
+## Tech Stack
+
+- Vue.js 3
+- Vite
+- Tailwind CSS
+- Axios
