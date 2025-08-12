@@ -150,28 +150,39 @@ async def predict_image(image: UploadFile = File(...)):
         # Get top 3 predictions
         top3_probs, top3_indices = torch.topk(probabilities[0], 3)
         top3_predictions = {
-            class_names[idx.item()]: float(prob) 
+            class_names[idx.item()].replace('_', ' ').title(): float(prob)*100
             for idx, prob in zip(top3_indices, top3_probs)
         }
+        print(f"Top 3 predictions: {top3_predictions}")  # Debug print
         
         # Generate Grad-CAM visualization
         try:
             heatmap = generate_gradcam(model, input_tensor, prediction.item())
-            visualization = overlay_heatmap(pil_image, heatmap)
+            original_img, heatmap_img, overlay_img = create_side_by_side_visualization(pil_image, heatmap)
+            visualization = {
+                "original": original_img,
+                "heatmap": heatmap_img,
+                "overlay": overlay_img
+            }
+            print("✅ Visualization generated successfully")
         except Exception as e:
-            print(f"Grad-CAM failed: {e}")
+            print(f"❌ Grad-CAM failed: {e}")
+            import traceback
+            traceback.print_exc()
             visualization = None
         
         # Prepare response
         result = {
             "prediction": predicted_class,
             "confidence": confidence_score,
-            "probabilities": top3_predictions,
+            "top3": top3_predictions,
+            "probabilities": top3_predictions,  # For backward compatibility
             "textual_explanation": explanation_result,
             "risk_level": get_risk_level(predicted_class),
             "visualization": visualization
         }
         
+        print(f"Full API response: {result}")
         return JSONResponse(content=result)
         
     except Exception as e:
@@ -251,7 +262,7 @@ def generate_gradcam(model, input_tensor, target_class):
         activations.append(output)
     
     # Register hooks on the last convolutional layer
-    target_layer = model.efficientnet.features[-1]
+    target_layer = model.backbone.features[-1]
     target_layer.register_forward_hook(forward_hook)
     target_layer.register_backward_hook(backward_hook)
     
@@ -279,6 +290,33 @@ def generate_gradcam(model, input_tensor, target_class):
     cam = cam / np.max(cam)
     
     return cam
+
+def create_side_by_side_visualization(image, heatmap):
+    """Create side-by-side visualization with original, heatmap, and overlay"""
+    # Resize original image
+    img_resized = image.resize((224, 224))
+    img_array = np.array(img_resized)
+    
+    # Create high-contrast heatmap
+    heatmap_colored = cv2.applyColorMap(np.uint8(255 * heatmap), cv2.COLORMAP_JET)
+    heatmap_colored = cv2.cvtColor(heatmap_colored, cv2.COLOR_BGR2RGB)
+    
+    # Create overlay
+    overlayed = 0.5 * img_array + 0.5 * heatmap_colored
+    overlayed = np.uint8(overlayed)
+    
+    # Convert to base64
+    def to_base64(img_array):
+        pil_img = Image.fromarray(img_array)
+        buffer = io.BytesIO()
+        pil_img.save(buffer, format='PNG')
+        return f"data:image/png;base64,{base64.b64encode(buffer.getvalue()).decode()}"
+    
+    return (
+        to_base64(img_array),           # Original
+        to_base64(heatmap_colored),     # Heatmap only
+        to_base64(overlayed)            # Overlay
+    )
 
 def overlay_heatmap(image, heatmap):
     """Overlay heatmap on original image"""

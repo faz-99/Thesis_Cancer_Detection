@@ -66,22 +66,56 @@
 
         <!-- Probabilities -->
         <div class="mb-6">
-          <h3 class="font-semibold text-lg mb-4">All Probabilities</h3>
+          <h3 class="font-semibold text-lg mb-4">Top 3 Probabilities</h3>
           <div class="space-y-2">
             <div v-for="(prob, className) in prediction.probabilities" :key="className" class="flex items-center">
-              <div class="w-32 text-sm">{{ formatClassName(className) }}</div>
+              <div class="w-32 text-sm">{{ className }}</div>
               <div class="flex-1 bg-gray-200 rounded-full h-2 mx-3">
-                <div class="bg-blue-600 h-2 rounded-full" :style="{ width: (prob * 100) + '%' }"></div>
+                <div class="bg-blue-600 h-2 rounded-full" :style="{ width: prob + '%' }"></div>
               </div>
-              <div class="w-16 text-sm text-right">{{ (prob * 100).toFixed(1) }}%</div>
+              <div class="w-16 text-sm text-right">{{ prob.toFixed(1) }}%</div>
             </div>
           </div>
+        </div>
+
+        <!-- Visualization -->
+        <div v-if="prediction.visualization" class="mb-6">
+          <h3 class="font-semibold text-lg mb-4">Visual Analysis</h3>
+          <div class="grid md:grid-cols-3 gap-4">
+            <div class="text-center">
+              <h4 class="text-sm font-medium mb-2">Original Image</h4>
+              <img :src="prediction.visualization.original" alt="Original" class="w-full rounded-lg border" />
+            </div>
+            <div class="text-center">
+              <h4 class="text-sm font-medium mb-2">Attention Heatmap</h4>
+              <img :src="prediction.visualization.heatmap" alt="Heatmap" class="w-full rounded-lg border" />
+            </div>
+            <div class="text-center">
+              <h4 class="text-sm font-medium mb-2">Overlay Analysis</h4>
+              <img :src="prediction.visualization.overlay" alt="Overlay" class="w-full rounded-lg border" />
+            </div>
+          </div>
+          <p class="text-sm text-gray-600 mt-2 text-center">
+            Red areas indicate regions that most influenced the AI's decision
+          </p>
         </div>
 
         <!-- Explanation -->
         <div v-if="prediction.textual_explanation" class="bg-blue-50 rounded-lg p-4">
           <h3 class="font-semibold text-lg mb-2">Medical Explanation</h3>
-          <p class="text-gray-700 leading-relaxed">{{ prediction.textual_explanation }}</p>
+          <div v-if="typeof prediction.textual_explanation === 'object'">
+            <p class="text-gray-700 leading-relaxed mb-3">{{ prediction.textual_explanation.explanation }}</p>
+            <div v-if="prediction.textual_explanation.relevant_facts && prediction.textual_explanation.relevant_facts.length > 0">
+              <h4 class="font-medium text-sm mb-2">Relevant Medical Facts:</h4>
+              <ul class="text-sm text-gray-600 space-y-1">
+                <li v-for="fact in prediction.textual_explanation.relevant_facts" :key="fact" class="flex items-start">
+                  <span class="text-blue-500 mr-2">•</span>
+                  {{ fact }}
+                </li>
+              </ul>
+            </div>
+          </div>
+          <p v-else class="text-gray-700 leading-relaxed">{{ prediction.textual_explanation }}</p>
         </div>
       </div>
     </div>
