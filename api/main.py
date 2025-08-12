@@ -14,6 +14,7 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.efficientnet import EfficientNetB0Classifier
+from src.enhanced_efficientnet import EnhancedEfficientNetB0
 from src.rag_explainer import RAGExplainer, explain_prediction
 
 app = FastAPI(title="Breast Cancer Detection API", version="1.0.0")
@@ -57,16 +58,20 @@ async def load_models():
     global model, rag_explainer
     
     try:
-        # Load trained model
-        model = EfficientNetB0Classifier(num_classes=8, pretrained=False)
-        
-        # Try to load saved weights, fallback to pretrained if not available
+        # Try to load lobular-enhanced model first
         try:
-            model.load_state_dict(torch.load("models/efficientnet_b0_best.pth", map_location=device))
-            print("✅ Loaded trained model weights")
+            model = EnhancedEfficientNetB0(num_classes=8, pretrained=False)
+            model.load_state_dict(torch.load("models/enhanced_efficientnet_lobular_v1.pth", map_location=device))
+            print("✅ Loaded lobular-enhanced model v1")
         except FileNotFoundError:
-            print("⚠️ No saved weights found, using pretrained model")
-            model = EfficientNetB0Classifier(num_classes=8, pretrained=True)
+            # Fallback to regular model
+            try:
+                model = EfficientNetB0Classifier(num_classes=8, pretrained=False)
+                model.load_state_dict(torch.load("models/efficientnet_b0_best.pth", map_location=device))
+                print("✅ Loaded original trained model")
+            except FileNotFoundError:
+                print("⚠️ No saved weights found, using pretrained model")
+                model = EfficientNetB0Classifier(num_classes=8, pretrained=True)
         
         model = model.to(device)
         model.eval()
@@ -98,7 +103,12 @@ async def predict_image(image: UploadFile = File(...)):
         
         # Make prediction
         with torch.no_grad():
-            output = model(input_tensor.unsqueeze(0).to(device))
+            if isinstance(model, EnhancedEfficientNetB0):
+                main_output, lobular_output = model(input_tensor.unsqueeze(0).to(device))
+                output = main_output
+            else:
+                output = model(input_tensor.unsqueeze(0).to(device))
+            
             probabilities = F.softmax(output, dim=1)
             confidence, prediction = torch.max(probabilities, 1)
         
