@@ -150,7 +150,7 @@ async def predict_image(image: UploadFile = File(...)):
         # Get top 3 predictions
         top3_probs, top3_indices = torch.topk(probabilities[0], 3)
         top3_predictions = {
-            class_names[idx.item()].replace('_', ' ').title(): float(prob)*100
+            class_names[idx.item()].replace('_', ' ').title(): float(prob)
             for idx, prob in zip(top3_indices, top3_probs)
         }
         print(f"Top 3 predictions: {top3_predictions}")  # Debug print

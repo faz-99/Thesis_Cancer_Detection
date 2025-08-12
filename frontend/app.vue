@@ -71,28 +71,28 @@
             <div v-for="(prob, className) in prediction.probabilities" :key="className" class="flex items-center">
               <div class="w-32 text-sm">{{ className }}</div>
               <div class="flex-1 bg-gray-200 rounded-full h-2 mx-3">
-                <div class="bg-blue-600 h-2 rounded-full" :style="{ width: prob + '%' }"></div>
+                <div class="bg-blue-600 h-2 rounded-full" :style="{ width: Math.min(prob * 100, 100) + '%' }"></div>
               </div>
-              <div class="w-16 text-sm text-right">{{ prob.toFixed(1) }}%</div>
+              <div class="w-16 text-sm text-right">{{ (prob * 100).toFixed(1) }}%</div>
             </div>
           </div>
         </div>
 
         <!-- Visualization -->
-        <div v-if="prediction.visualization" class="mb-6">
+        <div v-if="hasVisualization" class="mb-6">
           <h3 class="font-semibold text-lg mb-4">Visual Analysis</h3>
           <div class="grid md:grid-cols-3 gap-4">
             <div class="text-center">
               <h4 class="text-sm font-medium mb-2">Original Image</h4>
-              <img :src="prediction.visualization.original" alt="Original" class="w-full rounded-lg border" />
+              <img :src="visualizationData.original" alt="Original" class="w-full max-w-sm mx-auto rounded-lg border" style="max-height: 200px;" />
             </div>
             <div class="text-center">
               <h4 class="text-sm font-medium mb-2">Attention Heatmap</h4>
-              <img :src="prediction.visualization.heatmap" alt="Heatmap" class="w-full rounded-lg border" />
+              <img :src="visualizationData.heatmap" alt="Heatmap" class="w-full max-w-sm mx-auto rounded-lg border" style="max-height: 200px;" />
             </div>
             <div class="text-center">
               <h4 class="text-sm font-medium mb-2">Overlay Analysis</h4>
-              <img :src="prediction.visualization.overlay" alt="Overlay" class="w-full rounded-lg border" />
+              <img :src="visualizationData.overlay" alt="Overlay" class="w-full max-w-sm mx-auto rounded-lg border" style="max-height: 200px;" />
             </div>
           </div>
           <p class="text-sm text-gray-600 mt-2 text-center">
@@ -161,6 +161,8 @@ const predictImage = async () => {
       method: 'POST',
       body: formData
     })
+    console.log('API Response:', response)
+    console.log('Visualization data:', response.visualization)
     prediction.value = response
   } catch (error) {
     console.error('Prediction failed:', error)
@@ -173,4 +175,21 @@ const predictImage = async () => {
 const formatClassName = (className) => {
   return className.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
 }
+
+const hasVisualization = computed(() => {
+  return prediction.value && 
+         prediction.value.visualization && 
+         prediction.value.visualization.original &&
+         prediction.value.visualization.heatmap &&
+         prediction.value.visualization.overlay
+})
+
+const visualizationData = computed(() => {
+  if (!hasVisualization.value) return null
+  return {
+    original: prediction.value.visualization.original,
+    heatmap: prediction.value.visualization.heatmap,
+    overlay: prediction.value.visualization.overlay
+  }
+})
 </script>
