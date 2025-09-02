@@ -1,39 +1,53 @@
-# Advanced Cross-Dataset Training Requirements
-# Core ML libraries
-torch>=1.12.0
-torchvision>=0.13.0
-numpy>=1.21.0
-scikit-learn>=1.1.0
+# Advanced Thesis Requirements
+# Core ML/DL frameworks
+torch>=2.0.0
+torchvision>=0.15.0
+timm>=0.9.0
+transformers>=4.30.0
 
-# Image processing
-opencv-python>=4.6.0
-Pillow>=9.0.0
-scikit-image>=0.19.0
+# Advanced explainability
+shap>=0.42.0
+captum>=0.6.0
+lime>=0.2.0
 
-# Data handling
-pandas>=1.4.0
-matplotlib>=3.5.0
-seaborn>=0.11.0
-tqdm>=4.64.0
+# Computer vision and image processing
+opencv-python>=4.8.0
+Pillow>=10.0.0
+scikit-image>=0.21.0
+albumentations>=1.3.0
 
-# Additional dependencies for advanced techniques
-scipy>=1.8.0
-albumentations>=1.2.0  # Advanced augmentations
-imgaug>=0.4.0         # Additional augmentations
+# Scientific computing
+numpy>=1.24.0
+scipy>=1.11.0
+pandas>=2.0.0
+scikit-learn>=1.3.0
 
-# Optional GPU acceleration
-# cupy-cuda11x>=10.0.0  # Uncomment if using CUDA 11.x
-# cupy-cuda12x>=12.0.0  # Uncomment if using CUDA 12.x
+# Visualization
+matplotlib>=3.7.0
+seaborn>=0.12.0
+plotly>=5.15.0
 
-# Jupyter notebook support (optional)
+# API and web
+fastapi>=0.100.0
+uvicorn>=0.23.0
+python-multipart>=0.0.6
+
+# Utilities
+tqdm>=4.65.0
+wandb>=0.15.0
+tensorboard>=2.13.0
+omegaconf>=2.3.0
+
+# Style transfer and GANs
+kornia>=0.7.0
+
+# Medical imaging specific
+pydicom>=2.4.0
+nibabel>=5.1.0
+
+# Development and testing
+pytest>=7.4.0
+black>=23.0.0
+flake8>=6.0.0
 jupyter>=1.0.0
-ipykernel>=6.0.0
-
-# API dependencies (if using FastAPI)
-fastapi>=0.78.0
-uvicorn>=0.18.0
-python-multipart>=0.0.5
-
-# Logging and monitoring
-tensorboard>=2.9.0
-wandb>=0.12.0  # Optional: for experiment tracking
+ipykernel>=6.25.0
